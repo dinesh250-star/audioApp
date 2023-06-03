@@ -1,88 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import horse from "./horse.mp3";
 import car from "./car.mp3";
 import train from "./train.mp3";
+import rain from "./rain.mp3";
+import lion from "./lion.mp3";
+import { useRef } from "react";
 const Home = () => {
+  const [audioData, setAudioData] = useState([horse, car, train, rain, lion]);
+
+  const recent = useRef(null);
+  let count = -1;
+
   let audioCtx = new AudioContext();
-  let audio = new Audio(horse);
-  let audio2 = new Audio(car);
-  let audio3 = new Audio(train);
-  const source = audioCtx.createMediaElementSource(audio);
-  source.connect(audioCtx.destination);
 
-  const source2 = audioCtx.createMediaElementSource(audio2);
-  source2.connect(audioCtx.destination);
+  const playHandler = (e) => {
+    if (recent.current != null) {
+      recent.current.pause();
+      recent.current.currentTime = 0;
+    }
+    const selectedAudio = e.target.value;
 
-  const source3 = audioCtx.createMediaElementSource(audio3);
-  source3.connect(audioCtx.destination);
-
-  const playBtn = document.querySelector(".play");
-  const pauseBtn = document.querySelector(".pause");
-  const stopBtn = document.querySelector(".stop");
-  playBtn.addEventListener("click", () => {
+    let audio = new Audio(audioData[selectedAudio]);
+    const source = audioCtx.createMediaElementSource(audio);
+    source.connect(audioCtx.destination);
     if (audioCtx.state === "suspended") {
       audioCtx.resume();
     }
-    audio2.pause();
-    audio2.currentTime = 0;
-    audio3.pause();
-    audio3.currentTime = 0;
+
     audio.play();
-  });
-  pauseBtn.addEventListener("click", () => {
-    audio.pause();
-  });
-  stopBtn.addEventListener("click", () => {
-    console.log("note");
-    audio.pause();
-    audio.currentTime = 0;
-  });
+    recent.current = audio;
+  };
 
-  const playBtn2 = document.querySelector(".play2");
-  const pauseBtn2 = document.querySelector(".pause2");
-  const stopBtn2 = document.querySelector(".stop2");
-  playBtn2.addEventListener("click", () => {
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
-    audio.pause();
-    audio.currentTime = 0;
-    audio3.pause();
-    audio3.currentTime = 0;
-    audio2.play();
-  });
-  pauseBtn2.addEventListener("click", () => {
-    audio2.pause();
-  });
-  stopBtn2.addEventListener("click", () => {
-    console.log("note");
-    audio2.pause();
-    audio2.currentTime = 0;
-  });
-  const playBtn3 = document.querySelector(".play3");
-  const pauseBtn3 = document.querySelector(".pause3");
-  const stopBtn3 = document.querySelector(".stop3");
-  playBtn3.addEventListener("click", () => {
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
-    audio.pause();
-    audio.currentTime = 0;
-    audio2.pause();
-    audio2.currentTime = 0;
-    audio3.play();
-  });
-  pauseBtn3.addEventListener("click", () => {
-    audio3.pause();
-  });
-  stopBtn3.addEventListener("click", () => {
-    console.log("note");
-    audio3.pause();
-    audio3.currentTime = 0;
-  });
   return (
     <div>
-      <h1>hi</h1>
+      {audioData.map((i) => {
+        count = count + 1;
+
+        return (
+          <div key={count}>
+            <button className="play" value={count} onClick={playHandler}>
+              Play
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 };
